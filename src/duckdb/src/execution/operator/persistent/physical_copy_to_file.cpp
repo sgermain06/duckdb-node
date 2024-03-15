@@ -190,9 +190,8 @@ static void CreateDirectories(const vector<idx_t> &cols, const vector<string> &n
 	CreateDir(path, fs);
 
 	for (idx_t i = 0; i < cols.size(); i++) {
-		const auto &partition_col_name = names[cols[i]];
 		const auto &partition_value = values[i];
-		string p_dir = partition_col_name + "=" + partition_value.ToString();
+		string p_dir = partition_value.ToString();
 		path = fs.JoinPath(path, p_dir);
 		CreateDir(path, fs);
 	}
@@ -201,9 +200,8 @@ static void CreateDirectories(const vector<idx_t> &cols, const vector<string> &n
 static string GetDirectory(const vector<idx_t> &cols, const vector<string> &names, const vector<Value> &values,
                            string path, FileSystem &fs) {
 	for (idx_t i = 0; i < cols.size(); i++) {
-		const auto &partition_col_name = names[cols[i]];
 		const auto &partition_value = values[i];
-		string p_dir = partition_col_name + "=" + partition_value.ToString();
+		string p_dir = partition_value.ToString();
 		path = fs.JoinPath(path, p_dir);
 	}
 	return path;

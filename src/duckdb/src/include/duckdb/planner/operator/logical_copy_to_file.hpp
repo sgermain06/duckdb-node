@@ -38,6 +38,7 @@ public:
 	optional_idx file_size_bytes;
 
 	bool partition_output;
+	bool partition_by_value;
 	vector<idx_t> partition_columns;
 	vector<string> names;
 	vector<LogicalType> expected_types;

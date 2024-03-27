@@ -186,22 +186,30 @@ static void CreateDir(const string &dir_path, FileSystem &fs) {
 }
 
 static void CreateDirectories(const vector<idx_t> &cols, const vector<string> &names, const vector<Value> &values,
-                              string path, FileSystem &fs) {
+                              string path, FileSystem &fs, bool partition_by_value) {
 	CreateDir(path, fs);
 
 	for (idx_t i = 0; i < cols.size(); i++) {
 		const auto &partition_value = values[i];
 		string p_dir = partition_value.ToString();
+		if (!partition_by_value) {
+			const auto &partition_col_name = names[cols[i]];
+			p_dir = partition_col_name + "=" + partition_value.ToString();
+		}
 		path = fs.JoinPath(path, p_dir);
 		CreateDir(path, fs);
 	}
 }
 
 static string GetDirectory(const vector<idx_t> &cols, const vector<string> &names, const vector<Value> &values,
-                           string path, FileSystem &fs) {
+                           string path, FileSystem &fs, bool partition_by_value) {
 	for (idx_t i = 0; i < cols.size(); i++) {
 		const auto &partition_value = values[i];
 		string p_dir = partition_value.ToString();
+		if (!partition_by_value) {
+			const auto &partition_col_name = names[cols[i]];
+			p_dir = partition_col_name + "=" + partition_value.ToString();
+		}
 		path = fs.JoinPath(path, p_dir);
 	}
 	return path;
@@ -227,13 +235,13 @@ SinkCombineResultType PhysicalCopyToFile::Combine(ExecutionContext &context, Ope
 			// global_partitions have partitions added only at the back, so it's fine to only traverse the last part
 
 			for (idx_t i = g.created_directories; i < global_partitions.size(); i++) {
-				CreateDirectories(partition_columns, names, global_partitions[i]->first.values, trimmed_path, fs);
+				CreateDirectories(partition_columns, names, global_partitions[i]->first.values, trimmed_path, fs, partition_by_value);
 			}
 			g.created_directories = global_partitions.size();
 		}
 
 		for (idx_t i = 0; i < partitions.size(); i++) {
-			string hive_path = GetDirectory(partition_columns, names, partition_key_map[i]->values, trimmed_path, fs);
+			string hive_path = GetDirectory(partition_columns, names, partition_key_map[i]->values, trimmed_path, fs, partition_by_value);
 			string full_path(filename_pattern.CreateFilename(fs, hive_path, file_extension, l.writer_offset));
 			if (fs.FileExists(full_path) && !overwrite_or_ignore) {
 				throw IOException(

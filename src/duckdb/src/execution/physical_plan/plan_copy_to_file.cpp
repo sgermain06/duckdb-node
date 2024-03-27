@@ -61,6 +61,7 @@ unique_ptr<PhysicalOperator> PhysicalPlanGenerator::CreatePlan(LogicalCopyToFile
 	}
 	copy->partition_output = op.partition_output;
 	copy->partition_columns = op.partition_columns;
+	copy->partition_by_value = op.partition_by_value;
 	copy->names = op.names;
 	copy->expected_types = op.expected_types;
 	copy->parallel = mode == CopyFunctionExecutionMode::PARALLEL_COPY_TO_FILE;

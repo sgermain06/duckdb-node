@@ -57,6 +57,7 @@ BoundStatement Binder::BindCopyTo(CopyStatement &stmt) {
 	FilenamePattern filename_pattern;
 	bool user_set_use_tmp_file = false;
 	bool per_thread_output = false;
+	bool partition_by_value = false;
 	optional_idx file_size_bytes;
 	vector<idx_t> partition_cols;
 
@@ -102,6 +103,8 @@ BoundStatement Binder::BindCopyTo(CopyStatement &stmt) {
 		} else if (loption == "partition_by") {
 			auto converted = ConvertVectorToValue(std::move(option.second));
 			partition_cols = ParseColumnsOrdered(converted, select_node.names, loption);
+		} else if (loption == "partition_by_value_only") {
+			partition_by_value = GetBooleanArg(context, option.second);
 		} else {
 			stmt.info->options[option.first] = option.second;
 		}
@@ -152,6 +155,7 @@ BoundStatement Binder::BindCopyTo(CopyStatement &stmt) {
 	}
 	copy->partition_output = !partition_cols.empty();
 	copy->partition_columns = std::move(partition_cols);
+	copy->partition_by_value = partition_by_value;
 
 	copy->names = unique_column_names;
 	copy->expected_types = select_node.types;

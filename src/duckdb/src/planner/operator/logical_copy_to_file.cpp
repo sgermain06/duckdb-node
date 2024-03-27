@@ -17,6 +17,7 @@ void LogicalCopyToFile::Serialize(Serializer &serializer) const {
 	serializer.WriteProperty(204, "per_thread_output", per_thread_output);
 	serializer.WriteProperty(205, "partition_output", partition_output);
 	serializer.WriteProperty(206, "partition_columns", partition_columns);
+	serializer.WriteProperty(214, "partition_by_value", partition_by_value);
 	serializer.WriteProperty(207, "names", names);
 	serializer.WriteProperty(208, "expected_types", expected_types);
 	serializer.WriteProperty(209, "copy_info", copy_info);
@@ -42,6 +43,7 @@ unique_ptr<LogicalOperator> LogicalCopyToFile::Deserialize(Deserializer &deseria
 	auto overwrite_or_ignore = deserializer.ReadProperty<bool>(203, "overwrite_or_ignore");
 	auto per_thread_output = deserializer.ReadProperty<bool>(204, "per_thread_output");
 	auto partition_output = deserializer.ReadProperty<bool>(205, "partition_output");
+	auto partition_by_value = deserializer.ReadProperty<bool>(214, "partition_by_value");
 	auto partition_columns = deserializer.ReadProperty<vector<idx_t>>(206, "partition_columns");
 	auto names = deserializer.ReadProperty<vector<string>>(207, "names");
 	auto expected_types = deserializer.ReadProperty<vector<LogicalType>>(208, "expected_types");
@@ -90,6 +92,7 @@ unique_ptr<LogicalOperator> LogicalCopyToFile::Deserialize(Deserializer &deseria
 	result->per_thread_output = per_thread_output;
 	result->partition_output = partition_output;
 	result->partition_columns = partition_columns;
+	result->partition_by_value = partition_by_value;
 	result->names = names;
 	result->expected_types = expected_types;
 
